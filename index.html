@@ -2,9 +2,156 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Now Playing</title>
-  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    :root {
+      --bg: #121212;
+      --text: #ffffff;
+      --accent: #1db954;
+      --wave: #333333;
+      --progress: var(--accent);
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      padding: 1rem;
+      user-select: none;
+    }
+
+    main {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+    }
+
+    #waveform {
+      width: 90%;
+      max-width: 800px;
+      height: 128px;
+    }
+
+    #waveform canvas {
+      filter: drop-shadow(0 0 4px var(--accent));
+      transition: filter 0.3s ease;
+      width: 100% !important;
+      height: 128px !important;
+    }
+
+    footer#controls {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #222;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      padding: 0.5rem 0;
+      z-index: 100;
+      user-select: none;
+    }
+
+    button {
+      background: var(--accent);
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      width: 50px;
+      height: 50px;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #17c255;
+    }
+
+    /* Equalizer Section */
+    #equalizer {
+      background: #181818;
+      padding: 2rem;
+      text-align: center;
+      border-top: 1px solid #333;
+      max-width: 800px;
+      margin: 2rem auto 4rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      user-select: none;
+    }
+
+    #equalizer.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #equalizer h2 {
+      margin-bottom: 1rem;
+      color: var(--accent);
+    }
+
+    .slider-group {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .eq-band {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--text);
+    }
+
+    .eq-band label {
+      margin-bottom: 0.5rem;
+    }
+
+    .eq-band input[type="range"] {
+      -webkit-appearance: none;
+      width: 150px;
+      height: 6px;
+      background: var(--wave);
+      border-radius: 5px;
+      outline: none;
+    }
+
+    .eq-band input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .eq-band input[type="range"]::-webkit-slider-thumb:hover {
+      background: #fff;
+    }
+
+    .eq-band span {
+      margin-top: 0.25rem;
+      font-size: 0.9rem;
+      color: var(--accent);
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -16,26 +163,26 @@
     <div id="waveform"></div>
   </main>
 
-<section id="equalizer">
-  <h2>Equalizer</h2>
-  <div class="slider-group">
-    <div class="eq-band">
-      <label for="bass">Bass</label>
-      <input type="range" id="bass" min="-20" max="20" value="0" />
-      <span id="bassValue">0 dB</span>
+  <section id="equalizer">
+    <h2>Equalizer</h2>
+    <div class="slider-group">
+      <div class="eq-band">
+        <label for="bass">Bass</label>
+        <input type="range" id="bass" min="-20" max="20" value="0" />
+        <span id="bassValue">0 dB</span>
+      </div>
+      <div class="eq-band">
+        <label for="mid">Mid</label>
+        <input type="range" id="mid" min="-20" max="20" value="0" />
+        <span id="midValue">0 dB</span>
+      </div>
+      <div class="eq-band">
+        <label for="treble">Treble</label>
+        <input type="range" id="treble" min="-20" max="20" value="0" />
+        <span id="trebleValue">0 dB</span>
+      </div>
     </div>
-    <div class="eq-band">
-      <label for="mid">Mid</label>
-      <input type="range" id="mid" min="-20" max="20" value="0" />
-      <span id="midValue">0 dB</span>
-    </div>
-    <div class="eq-band">
-      <label for="treble">Treble</label>
-      <input type="range" id="treble" min="-20" max="20" value="0" />
-      <span id="trebleValue">0 dB</span>
-    </div>
-  </div>
-</section>
+  </section>
 
   <footer id="controls">
     <button id="rewind">⏪</button>
@@ -44,6 +191,103 @@
   </footer>
 
   <script src="https://unpkg.com/wavesurfer.js"></script>
-  <script src="script.js"></script>
+  <script>
+    // Grab theme colors from CSS variables
+    const waveColor = getComputedStyle(document.documentElement).getPropertyValue('--wave').trim();
+    const progressColor = getComputedStyle(document.documentElement).getPropertyValue('--progress').trim();
+
+    // Create WaveSurfer instance
+    const wavesurfer = WaveSurfer.create({
+      container: '#waveform',
+      waveColor,
+      progressColor,
+      height: 128,
+      responsive: true,
+      barWidth: 2,
+      barGap: 2,
+      barRadius: 2,
+      cursorWidth: 1,
+      normalize: true,
+    });
+
+    // Load your audio file — update path if needed
+    wavesurfer.load('audio/demo.mp3');
+
+    // Play/Pause button
+    const playBtn = document.getElementById('play');
+    playBtn.addEventListener('click', () => {
+      wavesurfer.playPause();
+      playBtn.textContent = wavesurfer.isPlaying() ? '⏸️' : '▶️';
+    });
+
+    // Equalizer filters setup
+    const audioCtx = wavesurfer.backend.ac;
+
+    const bassEQ = audioCtx.createBiquadFilter();
+    bassEQ.type = "lowshelf";
+    bassEQ.frequency.value = 200;
+
+    const midEQ = audioCtx.createBiquadFilter();
+    midEQ.type = "peaking";
+    midEQ.frequency.value = 1000;
+    midEQ.Q.value = 1;
+
+    const trebleEQ = audioCtx.createBiquadFilter();
+    trebleEQ.type = "highshelf";
+    trebleEQ.frequency.value = 3000;
+
+    // Connect filters to WaveSurfer backend
+    wavesurfer.backend.setFilter([bassEQ, midEQ, trebleEQ]);
+
+    // Slider controls and live value updates
+    const bassSlider = document.getElementById("bass");
+    const midSlider = document.getElementById("mid");
+    const trebleSlider = document.getElementById("treble");
+
+    const bassLabel = document.getElementById("bassValue");
+    const midLabel = document.getElementById("midValue");
+    const trebleLabel = document.getElementById("trebleValue");
+
+    bassSlider.addEventListener("input", (e) => {
+      const val = e.target.value;
+      bassEQ.gain.value = val;
+      bassLabel.textContent = `${val} dB`;
+    });
+
+    midSlider.addEventListener("input", (e) => {
+      const val = e.target.value;
+      midEQ.gain.value = val;
+      midLabel.textContent = `${val} dB`;
+    });
+
+    trebleSlider.addEventListener("input", (e) => {
+      const val = e.target.value;
+      trebleEQ.gain.value = val;
+      trebleLabel.textContent = `${val} dB`;
+    });
+
+    // Scroll reveal animation for equalizer section
+    function revealEqualizerOnScroll() {
+      const eqSection = document.getElementById('equalizer');
+      const rect = eqSection.getBoundingClientRect();
+
+      if (rect.top < window.innerHeight * 0.9) {
+        eqSection.classList.add('visible');
+        window.removeEventListener('scroll', revealEqualizerOnScroll);
+      }
+    }
+
+    window.addEventListener('scroll', revealEqualizerOnScroll);
+    // Run once in case equalizer is already visible on load
+    revealEqualizerOnScroll();
+
+    // Rewind and Skip button handlers (optional)
+    document.getElementById('rewind').addEventListener('click', () => {
+      wavesurfer.setCurrentTime(Math.max(wavesurfer.getCurrentTime() - 15, 0));
+    });
+    document.getElementById('skip').addEventListener('click', () => {
+      wavesurfer.setCurrentTime(Math.min(wavesurfer.getCurrentTime() + 15, wavesurfer.getDuration()));
+    });
+  </script>
 </body>
 </html>
