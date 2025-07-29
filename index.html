@@ -56,28 +56,42 @@
       bottom: 0;
       left: 0;
       right: 0;
-      background: #222;
+      background: #181818;
       display: flex;
       justify-content: center;
-      gap: 1rem;
-      padding: 0.5rem 0;
+      gap: 2rem;
+      padding: 1rem 0;
       z-index: 100;
       user-select: none;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.7);
     }
 
-    button {
-      background: var(--accent);
+    footer#controls button {
+      background: transparent;
       border: none;
-      border-radius: 6px;
-      color: white;
-      font-size: 1.5rem;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
       cursor: pointer;
-      width: 50px;
-      height: 50px;
-      transition: background 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      color: var(--accent);
     }
-    button:hover {
-      background: #17c255;
+
+    footer#controls button:hover,
+    footer#controls button:focus {
+      background-color: var(--accent);
+      color: var(--bg);
+      box-shadow: 0 0 8px var(--accent);
+      outline: none;
+    }
+
+    footer#controls svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
     }
 
     /* Equalizer Section */
@@ -185,9 +199,24 @@
   </section>
 
   <footer id="controls">
-    <button id="rewind">⏪</button>
-    <button id="play">▶️</button>
-    <button id="skip">⏩</button>
+    <button id="rewind" aria-label="Rewind 15 seconds" title="Rewind 15 seconds">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M11 18V6l-8.5 6L11 18zm1-6l8.5 6V6L12 12z"/>
+      </svg>
+    </button>
+    <button id="play" aria-label="Play/Pause" title="Play/Pause">
+      <svg id="play-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M8 5v14l11-7z"/>
+      </svg>
+      <svg id="pause-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="display:none;">
+        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+      </svg>
+    </button>
+    <button id="skip" aria-label="Skip 15 seconds" title="Skip 15 seconds">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M13 6v12l8.5-6L13 6zm-1 6L3.5 6v12L12 12z"/>
+      </svg>
+    </button>
   </footer>
 
   <script src="https://unpkg.com/wavesurfer.js"></script>
@@ -210,14 +239,23 @@
       normalize: true,
     });
 
-    // Load your audio file — update path if needed
-    wavesurfer.load('audio/demo.mp3');
+    // Load your audio file (URL encoded Éire.mp3)
+    wavesurfer.load('audio/%C9ire.mp3');
 
-    // Play/Pause button
+    // Play/Pause button and icon toggling
     const playBtn = document.getElementById('play');
+    const playIcon = document.getElementById('play-icon');
+    const pauseIcon = document.getElementById('pause-icon');
+
     playBtn.addEventListener('click', () => {
       wavesurfer.playPause();
-      playBtn.textContent = wavesurfer.isPlaying() ? '⏸️' : '▶️';
+      if (wavesurfer.isPlaying()) {
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'block';
+      } else {
+        playIcon.style.display = 'block';
+        pauseIcon.style.display = 'none';
+      }
     });
 
     // Equalizer filters setup
@@ -281,7 +319,7 @@
     // Run once in case equalizer is already visible on load
     revealEqualizerOnScroll();
 
-    // Rewind and Skip button handlers (optional)
+    // Rewind and Skip button handlers
     document.getElementById('rewind').addEventListener('click', () => {
       wavesurfer.setCurrentTime(Math.max(wavesurfer.getCurrentTime() - 15, 0));
     });
