@@ -2,59 +2,110 @@
   --bg: #121212;
   --text: #ffffff;
   --accent: #1db954;
-  --wave: #444;
+  --wave: #333333;
   --progress: var(--accent);
 }
 
+/* General Styles */
 body {
-  margin: 0;
-  font-family: sans-serif;
-  background-color: var(--bg);
-  color: var(--text);
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+  /* ... */
 }
 
 header {
-  padding: 1rem;
-  text-align: center;
-  background: #1a1a1a;
+  /* ... */
 }
 
 main {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
+  /* ... */
 }
 
 #waveform {
-  width: 100%;
-  max-width: 800px;
-  height: 128px;
+  /* ... */
+}
+
+#waveform canvas {
+  filter: drop-shadow(0 0 4px var(--accent));
+  transition: filter 0.3s ease;
 }
 
 footer#controls {
-  position: sticky;
-  bottom: 0;
-  background: #181818;
-  padding: 1rem;
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  box-shadow: 0 -2px 5px rgba(0,0,0,0.4);
+  /* ... */
 }
 
 button {
-  background: none;
-  border: none;
-  color: var(--text);
-  font-size: 1.5rem;
-  cursor: pointer;
+  /* ... */
 }
 
-button:hover {
+/* 🔽 PLACE THIS AT THE BOTTOM 🔽 */
+
+/* Equalizer Section */
+#equalizer {
+  background: #181818;
+  padding: 2rem;
+  text-align: center;
+  border-top: 1px solid #333;
+}
+
+#equalizer h2 {
+  margin-bottom: 1rem;
   color: var(--accent);
 }
+
+.slider-group {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.eq-band {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--text);
+}
+
+.eq-band label {
+  margin-bottom: 0.5rem;
+}
+
+.eq-band input[type="range"] {
+  -webkit-appearance: none;
+  width: 150px;
+  height: 6px;
+  background: var(--wave);
+  border-radius: 5px;
+  outline: none;
+}
+
+.eq-band input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.eq-band input[type="range"]::-webkit-slider-thumb:hover {
+  background: #fff;
+}
+
+.eq-band span {
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+  color: var(--accent);
+}
+#equalizer {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+#equalizer.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
