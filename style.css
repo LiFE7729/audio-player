@@ -1,0 +1,60 @@
+:root {
+  --bg: #121212;
+  --text: #ffffff;
+  --accent: #1db954;
+  --wave: #444;
+  --progress: var(--accent);
+}
+
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  padding: 1rem;
+  text-align: center;
+  background: #1a1a1a;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+#waveform {
+  width: 100%;
+  max-width: 800px;
+  height: 128px;
+}
+
+footer#controls {
+  position: sticky;
+  bottom: 0;
+  background: #181818;
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.4);
+}
+
+button {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+button:hover {
+  color: var(--accent);
+}
