@@ -16,6 +16,27 @@
     <div id="waveform"></div>
   </main>
 
+<section id="equalizer">
+  <h2>Equalizer</h2>
+  <div class="slider-group">
+    <div class="eq-band">
+      <label for="bass">Bass</label>
+      <input type="range" id="bass" min="-20" max="20" value="0" />
+      <span id="bassValue">0 dB</span>
+    </div>
+    <div class="eq-band">
+      <label for="mid">Mid</label>
+      <input type="range" id="mid" min="-20" max="20" value="0" />
+      <span id="midValue">0 dB</span>
+    </div>
+    <div class="eq-band">
+      <label for="treble">Treble</label>
+      <input type="range" id="treble" min="-20" max="20" value="0" />
+      <span id="trebleValue">0 dB</span>
+    </div>
+  </div>
+</section>
+
   <footer id="controls">
     <button id="rewind">⏪</button>
     <button id="play">▶️</button>
